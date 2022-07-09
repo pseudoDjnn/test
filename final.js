@@ -171,6 +171,10 @@ export default class Template {
           value: new THREE.Vector2(1, 1)
         },
       },
+      roughness: .34,
+      metalness: .5,
+      reflectivity: 1.,
+      clearcoat: 0,
       // wireframe: true,
       // transparent: true,
       side: THREE.DoubleSide,
@@ -185,8 +189,8 @@ export default class Template {
     let bary = [];
 
     for (let i = 0; i < length / 3.; i++) {
-      bary.push(0, 1, 0.,
-        0.5, 0, 1,
+      bary.push(1, 1, 1.,
+        0.5, 0, 0,
         1, 0.5, 0)
     }
 
@@ -198,7 +202,7 @@ export default class Template {
     this._scene.add(this.fShape);
     this._scene.add(this.fShape1);
     this.fShape.position.set(-2.0, -1.0, -5.1);
-    this.fShape1.position.set(-2.0, -1.001, -5.01);
+    this.fShape1.position.set(-2.0, -1.0, -5.1);
     // this.fShape1.position.set(1, -1, 0.5);
     // this.fShape1.rotateY = (0.006);
   }
@@ -346,8 +350,8 @@ export default class Template {
     this._background1.rotation.x = this.time;
     this._background1.rotation.y = this.time;
     this.fShape.rotation.y = this.time / -7.0;
-    this.fMaterial.uniforms.time.value = this.time / 10.;
-    this.fMaterial1.uniforms.time.value = this.time / 6.1;
+    this.fMaterial.uniforms.time.value = this.time / 4.3;
+    this.fMaterial1.uniforms.time.value = this.time / 3.6;
     this.fShape1.rotation.y = this.time / -7.0;
     this.material.uniforms.time.value = this.time / 38.;
     // this.material1.uniforms.progress.value = this.settings.progress;

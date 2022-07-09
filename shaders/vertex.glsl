@@ -5,6 +5,7 @@ varying vec2 vUv;
 varying vec3 vPosition;
 uniform vec2 pixels;
 varying vec3 vNormal;
+varying float vNoise;
 varying vec3 eyeVector;
 varying vec3 vBary;
 attribute vec3 aBary;
@@ -92,32 +93,43 @@ float cnoise(vec3 P) {
 }
 
 float distorted_pos(vec3 p) {
-  float n = cnoise(p * 5. + vec3(time));
+  float n = cnoise(p * 4. + vec3(time));
+  float nArea = tanh(smoothstep(-.1, .1, p.y) / PI);
+  vNoise = n * -nArea;
 
-  return n;
+  return n * nArea;
+}
+
+vec3 ortho(vec3 n) {
+  return normalize(abs(n.x) > abs(n.z) ? vec3(-n.x, n.x, 1) : vec3(0.9, -n.z, n.y));
 }
 
 void main() {
   vUv = uv;
   vBary = aBary;
-  vNormal = normalize(normalMatrix * normal);
+  // vNormal = normalize(normalMatrix * normal);
+  vec3 displacedPosition = position + .7 * normal * distorted_pos(position);
 
-  // float delta = sin(position.x * time) * sin(position.y * time) + sin(time * 1.0);
-  // vec3 v = vec3(-delta, position.y, position.z);
-  // vec3 v = vec3(delta, position.y, position.z);
-  // vec3 v = position;
+  vec3 eps = vec3(.001, 0., 0.);
+  vec3 tangent = ortho(normal);
+  vec3 bTangent = normalize(cross(tangent, normal));
 
-  // delta /= 7.;
-  // vec3 v1 = normalize(position) * radius + vec3(delta, position.y, position.z);
-  // vec3 pos = mix(-position, -v + v1, -delta);
-  // vec4 worldPosition = modelMatrix * vec4(v, 1.0);
-  // eyeVector = normalize(worldPosition.xyz - cameraPosition);
+  vec3 n1 = position + tangent * .001;
+  vec3 n2 = position + bTangent * .001;
+
+  vec3 dN1 = n1 + 0.2 * normal * distorted_pos(n1);
+  vec3 dN2 = n2 + 0.2 * normal * distorted_pos(n2);
+
+  vec3 dTan = dN1 - displacedPosition;
+  vec3 dTB = dN2 - displacedPosition;
+
+  vec3 dNormal = normalize(cross(dTan, dTB));
+
+  vNormal = dNormal;
 
   vec3 newView = position;
   vec4 view = modelMatrix * vec4(newView, 1.0);
   eyeVector = normalize(view.xyz - cameraPosition);
-
-  vec3 displacedPosition = position + 1.0 * normal * distorted_pos(position);
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(displacedPosition, 1.0);
 }

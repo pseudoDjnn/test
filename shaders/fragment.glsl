@@ -5,6 +5,7 @@ uniform sampler2D displacement;
 uniform vec2 resolution;
 varying vec2 vUv;
 varying vec3 vNormal;
+varying float vNoise;
 varying vec3 eyeVector;
 varying vec3 vBary;
 
@@ -39,7 +40,7 @@ void main() {
   displacementUV.y = mix(vUv.y, -displacement.r - 2.2, vUv.x);
 
   vec4 t = texture2D(landscape, uv);
-  gl_FragColor = t + displacement;
+  gl_FragColor = t + displacement * sin(vNoise);
   // gl_FragColor = vec4(vBary, 1.0);
   // gl_FragColor = vec4(eyeVector, 1.);
 }
