@@ -1,0 +1,20 @@
+uniform float time;
+varying vec2 vUV;
+varying vec3 vPosition;
+varying vec3 vNormal;
+uniform sampler2D t;
+varying vec2 vScreenSpace;
+varying vec3 vViewDirection;
+uniform vec2 pixels;
+float PI = 3.141592653589793;
+
+void main() {
+  vUV = uv;
+  vPosition = position;
+  vNormal = normalize(mat3(modelMatrix) * normal);
+
+  vec3 worldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
+  vViewDirection = normalize(worldPosition - cameraPosition);
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  vScreenSpace = gl_Position.xy / gl_Position.w;
+}
