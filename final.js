@@ -58,7 +58,7 @@ export default class Template {
     const far = 1000.0;
     this._camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     // this._camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1.001, 1000)
-    this._camera.position.set(-1, 0, 4);
+    this._camera.position.set(0, 0, 0);
 
 
     const controls = new OrbitControls(
@@ -154,7 +154,7 @@ export default class Template {
 
 
 
-    this.fGeometry = new THREE.IcosahedronGeometry(3.9, 1.);
+    this.fGeometry = new THREE.IcosahedronBufferGeometry(1.9, 1.);
 
     this.fShape = new THREE.Mesh(this.fGeometry, this.fMaterial);
 
@@ -178,16 +178,16 @@ export default class Template {
       fragmentShader: fragmentShader1,
     });
 
-    this.fGeometry1 = new THREE.IcosahedronBufferGeometry(3.9, 1.);
+    this.fGeometry1 = new THREE.IcosahedronBufferGeometry(1.9, 1.);
     let length = this.fGeometry1.attributes.position.array.length;
 
 
     let bary = [];
 
     for (let i = 0; i < length / 3.; i++) {
-      bary.push(1, 0, .2,
-        1, .5, 0,
-        .9, 0.001, 0.3)
+      bary.push(0, 1, 0.,
+        0.5, 0, 1,
+        1, 0.5, 0)
     }
 
     let aBary = new Float32Array(bary);
@@ -196,9 +196,9 @@ export default class Template {
     this.fShape1 = new THREE.Mesh(this.fGeometry1, this.fMaterial1);
 
     this._scene.add(this.fShape);
-    // this._scene.add(this.fShape1);
-    this.fShape.position.set(0.0, 0.0, -6.1);
-    this.fShape1.position.set(-5.0, 0.0, -1.1);
+    this._scene.add(this.fShape1);
+    this.fShape.position.set(-2.0, -1.0, -5.1);
+    this.fShape1.position.set(-2.0, -1.001, -5.01);
     // this.fShape1.position.set(1, -1, 0.5);
     // this.fShape1.rotateY = (0.006);
   }
@@ -346,6 +346,8 @@ export default class Template {
     this._background1.rotation.x = this.time;
     this._background1.rotation.y = this.time;
     this.fShape.rotation.y = this.time / -7.0;
+    this.fMaterial.uniforms.time.value = this.time / 10.;
+    this.fMaterial1.uniforms.time.value = this.time / 6.1;
     this.fShape1.rotation.y = this.time / -7.0;
     this.material.uniforms.time.value = this.time / 38.;
     // this.material1.uniforms.progress.value = this.settings.progress;
