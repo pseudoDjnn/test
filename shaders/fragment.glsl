@@ -21,7 +21,7 @@ void main() {
   vec3 normal = normalize(cross(X, Y));
   float diffuse = dot(normal, vec3(1.));
 
-  vec2 rand = hash22(vec2(floor(diffuse * 3.915)));
+  vec2 rand = hash22(vec2(floor(diffuse * 7.83)));
 
   vec2 uVv = vec2(sign(rand.x - 0.5) * 1. + (rand.x - 0.5) * .6, sign(rand.y - 0.5) * 1. + (-rand.y - 0.5 * 1.5) * .6);
 
@@ -40,7 +40,7 @@ void main() {
   displacementUV.y = mix(vUv.y, -displacement.r - 2.2, vUv.x);
 
   vec4 t = texture2D(landscape, uv);
-  gl_FragColor = t + displacement * sin(vNoise);
+  gl_FragColor = t + displacement;
   // gl_FragColor = vec4(vBary, 1.0);
   // gl_FragColor = vec4(eyeVector, 1.);
 }

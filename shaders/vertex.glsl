@@ -30,7 +30,7 @@ float cnoise(vec3 P) {
   Pi0 = mod(Pi0, 289.0);
   Pi1 = mod(Pi1, 289.0);
   vec3 Pf0 = fract(P); // Fractional part for interpolation
-  vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0
+  vec3 Pf1 = Pf0 - vec3(1.3); // Fractional part - 1.0
   vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);
   vec4 iy = vec4(Pi0.yy, Pi1.yy);
   vec4 iz0 = Pi0.zzzz;
@@ -40,16 +40,16 @@ float cnoise(vec3 P) {
   vec4 ixy0 = permute(ixy + iz0);
   vec4 ixy1 = permute(ixy + iz1);
 
-  vec4 gx0 = ixy0 / 7.0;
-  vec4 gy0 = fract(floor(gx0) / 7.0) - 0.5;
+  vec4 gx0 = ixy0 / 7.83;
+  vec4 gy0 = fract(floor(gx0) / 7.83) - 0.5;
   gx0 = fract(gx0);
   vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);
   vec4 sz0 = step(gz0, vec4(0.0));
   gx0 -= sz0 * (step(0.0, gx0) - 0.5);
   gy0 -= sz0 * (step(0.0, gy0) - 0.5);
 
-  vec4 gx1 = ixy1 / 7.0;
-  vec4 gy1 = fract(floor(gx1) / 7.0) - 0.5;
+  vec4 gx1 = ixy1 / 7.83;
+  vec4 gy1 = fract(floor(gx1) / 7.83) - 0.5;
   gx1 = fract(gx1);
   vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);
   vec4 sz1 = step(gz1, vec4(0.0));
@@ -93,11 +93,11 @@ float cnoise(vec3 P) {
 }
 
 float distorted_pos(vec3 p) {
-  float n = cnoise(p * 4. + vec3(time));
-  float nArea = tanh(smoothstep(-.1, .1, p.y) / PI);
+  float n = cnoise(p * 6. + vec3(time));
+  float nArea = sin(smoothstep(-.1, .1, p.y) / PI);
   vNoise = n * -nArea;
 
-  return n * nArea;
+  return n + nArea;
 }
 
 vec3 ortho(vec3 n) {
@@ -108,14 +108,14 @@ void main() {
   vUv = uv;
   vBary = aBary;
   // vNormal = normalize(normalMatrix * normal);
-  vec3 displacedPosition = position + .7 * normal * distorted_pos(position);
+  vec3 displacedPosition = position + .7 * normal * distorted_pos(position * 10. + time / 10.) * abs(sin(time / 64.));
 
   vec3 eps = vec3(.001, 0., 0.);
-  vec3 tangent = ortho(normal);
-  vec3 bTangent = normalize(cross(tangent, normal));
+  vec3 tangent = ortho(normal) * time;
+  vec3 bTangent = normalize(cross(tangent, normal) * time);
 
-  vec3 n1 = position + tangent * .001;
-  vec3 n2 = position + bTangent * .001;
+  vec3 n1 = position + tangent * .00000000001;
+  vec3 n2 = position + bTangent * .0001;
 
   vec3 dN1 = n1 + 0.2 * normal * distorted_pos(n1);
   vec3 dN2 = n2 + 0.2 * normal * distorted_pos(n2);
@@ -123,11 +123,14 @@ void main() {
   vec3 dTan = dN1 - displacedPosition;
   vec3 dTB = dN2 - displacedPosition;
 
-  vec3 dNormal = normalize(cross(dTan, dTB));
+  vec3 dNormal = normalize(cross(dTan, dTB) * time);
 
   vNormal = dNormal;
 
   vec3 newView = position;
+  newView.y += 0.1 * (sin(newView.y * 128. + time) * .7 + .7);
+  newView.z += 0.05 * (sin(newView.y * 64. + time) * .7 + .7);
+
   vec4 view = modelMatrix * vec4(newView, 1.0);
   eyeVector = normalize(view.xyz - cameraPosition);
 

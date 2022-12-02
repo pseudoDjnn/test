@@ -22,5 +22,24 @@ void main() {
   if(line < 0.1)
     discard;
 
+  // float b = vBary;
+  float widthL = .27;
+
+  float borderX = max(step(vUv.x, widthL), step(1. - vUv.x, widthL));
+  float borderY = max(step(vUv.y, widthL), step(1. - vUv.y, widthL));
+  float border = max(borderX, borderY);
+
+  // float border = max(step(b.r, widthL), step(b.g, widthL));
+  vec3 color = vec3(border);
+
+  vec3 light = vec3(0.);
+  vec3 sColor = vec3(0.89, 0.98, 0.98);
+  vec3 gColor = vec3(0.61, 0.54, 0.2);
+  vec3 lightDirection = normalize(vec3(1., 1., 1.));
+  light += dot(lightDirection, vNormal);
+  light = mix(sColor, gColor, dot(lightDirection, vNormal));
+
   gl_FragColor = vec4(mix(vec3(1.), vec3(0.), -line), 1.0);
+
+  gl_FragColor = vec4(light * color, 0.3);
 }
